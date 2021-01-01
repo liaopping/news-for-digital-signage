@@ -1,0 +1,29 @@
+version: '3'
+services:
+  postgres:
+    image: postgres
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: 'admin'
+      POSTGRES_PASSWORD: 'admin-pass'
+    restart: always
+
+  app:
+    build: .
+    image: rails
+    container_name: 'app'
+    command: bundle exec rails s -p 80 -b '0.0.0.0'
+    stdin_open: true
+    tty: true
+    ports:
+      - "80:80"
+    environment:
+      VIRTUAL_PORT: 80
+    volumes:
+      - .:/my_app
+    depends_on:
+      - postgres
+    restart: always

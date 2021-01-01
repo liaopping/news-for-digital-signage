@@ -1,15 +1,24 @@
-# デジタルサイネージ用ニュース
+# README
 
-## 実現したいこと
-画面がリロードされるたびに違うニュースを表示する  
-タイトル・画像・要約
+This README would normally document whatever steps are necessary to get the
+application up and running.
 
-## 使用API
-[Bing News Search API](https://docs.microsoft.com/ja-jp/azure/cognitive-services/bing-news-search/search-the-web)
+Things you may want to cover:
 
-## 使用技術
-- Ruby(Ruby on Rails)
-- JavaScript(やれたらやる)
+* Ruby version
 
-## 備考
-- APIを叩く回数に注意する(6:00, 12:00, 18:00, 24:00...?)
+* System dependencies
+
+* Configuration
+
+* Database creation
+
+* Database initialization
+
+* How to run the test suite
+
+* Services (job queues, cache servers, search engines, etc.)
+
+* Deployment instructions
+
+* ...
