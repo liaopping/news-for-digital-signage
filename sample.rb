@@ -15,7 +15,7 @@ accessKey = "fc0a1e325d724ee4a3cb084916a9f810"
 # the endpoint for your Bing Search instance in your Azure dashboard.
 
 uri  = "https://api.bing.microsoft.com"
-path = "/v7.0/news?category=Business"
+path = "/v7.0/news/search"
 
 term = ""
 
