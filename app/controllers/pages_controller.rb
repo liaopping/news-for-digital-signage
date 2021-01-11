@@ -5,7 +5,7 @@ class PagesController < ApplicationController
   require 'time'
 
   def main
-    accessKey = "fc0a1e325d724ee4a3cb084916a9f810"
+    accessKey = ENV['ACCESS_KEY']
     uri  = "https://api.bing.microsoft.com" #APIエンドポイント
     path = "/v7.0/news/search" #ニュース検索のURL
 
