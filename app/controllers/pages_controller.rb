@@ -7,7 +7,7 @@ class PagesController < ApplicationController
   def main
     accessKey = ENV['ACCESS_KEY']
     uri  = "https://api.bing.microsoft.com" #APIエンドポイント
-    path = "/v7.0/news/search" #ニュース検索のURL
+    path = "/v7.0/news/search?mkt=ja-jp" #ニュース検索のURL
 
     uri = URI(uri + path)
     request = Net::HTTP::Get.new(uri)
