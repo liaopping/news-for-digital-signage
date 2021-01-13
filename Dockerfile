@@ -7,7 +7,8 @@ RUN apt-get update -qq && \
                        imagemagick \
                        cron \
                        vim \
-                       curl
+                       curl \
+                       memcached
 RUN mkdir /my_app
 ENV APP_ROOT /my_app
 WORKDIR $APP_ROOT
