@@ -41,7 +41,7 @@ header{
   font-size: 30px;
 }
 
-.container > .description > .date_published_at {
+.container > .description > .date_published {
   color: whitesmoke;
   text-align: right;
   font-size: 23px;
