@@ -5,9 +5,13 @@ class PagesController < ApplicationController
   require 'time'
 
   def main
-    latest_news_in_db = Page.all.order(date_published: "DESC").first
-    diff = Time.now - latest_news_in_db["date_published"]
-    diff_converted_hour = diff / 3600
+    if Page.exists?
+      latest_news_in_db = Page.all.order(date_published: "DESC").first
+      diff = Time.now - latest_news_in_db["date_published"]
+      diff_converted_hour = diff / 3600
+    else
+      diff_converted_hour = 3
+    end
     # 現在の日時と最新のニュースの投稿日時の差が3時間あれば新しいニュースを取りに行く
     if diff_converted_hour >= 3
       # Bing News Search APIを叩く
