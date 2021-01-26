@@ -21,7 +21,7 @@ class PagesController < ApplicationController
       uri = URI(uri + path)
       request = Net::HTTP::Get.new(uri)
       request['Ocp-Apim-Subscription-Key'] = accessKey
-      @response = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+      response = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           http.request(request)
       end
       # DBの中身を削除する(最新記事のみDBに保存されているようにしたい)
@@ -29,7 +29,7 @@ class PagesController < ApplicationController
         Page.destroy_all
       end
       # レスポンスを保存する
-      article_array = JSON.parse(@response.body)["value"]
+      article_array = JSON.parse(response.body)["value"]
       article_array.each do |article|
         if article["image"] != nil
           image_url = article["image"]["thumbnail"]["contentUrl"]
@@ -63,5 +63,8 @@ class PagesController < ApplicationController
     @provider_name = random_article.provider_name
     parsed_date_published = random_article.date_published.in_time_zone('Tokyo')
     @date_published = "#{parsed_date_published.month}月#{parsed_date_published.day}日#{parsed_date_published.hour}時#{parsed_date_published.min}分"
+    @image_url = random_article.image_url
+    @image_width = random_article.image_width
+    @image_height = random_article.image_height
   end
 end
