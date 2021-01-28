@@ -2,6 +2,9 @@ class PagesController < ApplicationController
   require 'net/https'
   require 'uri'
   require 'json'
+  require 'open-uri'
+  require 'nokogiri'
+  require 'fastimage'
   require 'time'
 
   def main
@@ -31,14 +34,43 @@ class PagesController < ApplicationController
       # レスポンスを保存する
       article_array = JSON.parse(response.body)["value"]
       article_array.each do |article|
-        if article["image"] != nil
+        nokogiri_url = Nokogiri::HTML(URI.open(article["url"]))
+        image_url_array = []
+        nokogiri_url.search('//img').each do |element_in_url|
+            if element_in_url.attributes["src"] != nil
+                image_url_array << element_in_url.attributes["src"].value
+            end
+        end
+        if image_url_array.size > 0
+            parsed_image_url_array = image_url_array.select{ |x| x.include?("https")}
+            result = 0
+            result_place = 0
+            result_width = 0
+            result_height = 0
+            if parsed_image_url_array.size > 0
+              parsed_image_url_array.each_with_index do |elt, idx|
+                image_size = FastImage.size(elt)
+                if result < image_size[0] + image_size[1]
+                  result = image_size[0] + image_size[1]
+                  result_width = image_size[0]
+                  result_height = image_size[1]
+                  result_place = idx
+                end
+              end
+            end
+        end
+        if parsed_image_url_array.size > 0
+          image_url = parsed_image_url_array[result_place]
+          image_width = result_width
+          image_height = result_height
+        elsif article["image"] != nil
           image_url = article["image"]["thumbnail"]["contentUrl"]
           image_width = article["image"]["thumbnail"]["width"]
           image_height = article["image"]["thumbnail"]["height"]
         else
           image_url = "https://1.bp.blogspot.com/-D2I7Z7-HLGU/Xlyf7OYUi8I/AAAAAAABXq4/jZ0035aDGiE5dP3WiYhlSqhhMgGy8p7zACNcBGAsYHQ/s1600/no_image_square.jpg"
-          image_width = 250
-          image_height = 250
+          image_width = 300
+          image_height = 300
         end
         if article["datePublished"] != nil
           date_published = Time.iso8601(article["datePublished"])
