@@ -3,20 +3,12 @@ class PagesController < ApplicationController
   require 'uri'
   require 'json'
   require 'open-uri'
-  require 'nokogiri'
-  require 'fastimage'
   require 'time'
 
   def main
-    if Page.exists?
-      latest_news_in_db = Page.all.order(date_published: "DESC").first
-      diff = Time.now - latest_news_in_db["date_published"]
-      diff_converted_hour = diff / 3600
-    else
-      diff_converted_hour = 3
-    end
+    time_diff = Page.time_diff_between_current_and_latest_news
     # 現在の日時と最新のニュースの投稿日時の差が3時間あれば新しいニュースを取りに行く
-    if diff_converted_hour >= 3
+    if time_diff >= 3
       # Bing News Search APIを叩く
       accessKey = ENV['ACCESS_KEY']
       uri  = "https://api.bing.microsoft.com"
@@ -31,36 +23,38 @@ class PagesController < ApplicationController
       if Page.exists?
         Page.destroy_all
       end
-      # レスポンスを保存する
+      # レスポンスの記事を全て配列に詰め、一つずつDBに保存していく
       article_array = JSON.parse(response.body)["value"]
       article_array.each do |article|
+        # Nokogiriで記事のHTMLを取得
         nokogiri_url = Nokogiri::HTML(URI.open(article["url"]))
-        image_url_array = []
+        image_src_array = []
+        # imgタグを全て抽出し、src属性の値を全て配列に詰める
         nokogiri_url.search('//img').each do |element_in_url|
             if element_in_url.attributes["src"] != nil
-                image_url_array << element_in_url.attributes["src"].value
+                image_src_array << element_in_url.attributes["src"].value
             end
         end
-        if image_url_array.size > 0
-            parsed_image_url_array = image_url_array.select{ |x| x.include?("https")}
-            result = 0
-            result_place = 0
-            result_width = 0
-            result_height = 0
-            if parsed_image_url_array.size > 0
-              parsed_image_url_array.each_with_index do |elt, idx|
-                image_size = FastImage.size(elt)
-                if result < image_size[0] + image_size[1]
-                  result = image_size[0] + image_size[1]
-                  result_width = image_size[0]
-                  result_height = image_size[1]
-                  result_place = idx
-                end
+        if image_src_array.size > 0
+          # httpsを含むURLのみ配列に詰める
+          https_image_array = image_src_array.select{ |x| x.include?("https")}
+          result_size, result_place, result_width, result_height = 0, 0, 0, 0
+          # httpsを含むURLが一つ以上あれば、画像サイズ判定の処理に進む
+          if https_image_array.size > 0
+            https_image_array.each_with_index do |elt, idx|
+              # image_size[width, height]
+              image_size = FastImage.size(elt)
+              if result_size < image_size[0] + image_size[1]
+                result_size = image_size[0] + image_size[1]
+                result_width = image_size[0]
+                result_height = image_size[1]
+                result_place = idx
               end
             end
+          end
         end
-        if parsed_image_url_array.size > 0
-          image_url = parsed_image_url_array[result_place]
+        if https_image_array != nil && https_image_array.size > 0
+          image_url = https_image_array[result_place]
           image_width = result_width
           image_height = result_height
         elsif article["image"] != nil
@@ -86,17 +80,21 @@ class PagesController < ApplicationController
                     provider_name: article["provider"][0]["name"], 
                     date_published: date_published)
       end
-      random_article = Page.where( 'id >= ?', rand(Page.first.id..Page.last.id) ).first
+      @random_article = Page.where( 'id >= ?', rand(Page.first.id..Page.last.id) ).first
     else
-      random_article = Page.where( 'id >= ?', rand(Page.first.id..Page.last.id) ).first
+      @random_article = Page.where( 'id >= ?', rand(Page.first.id..Page.last.id) ).first
     end
-    @title = random_article.name
-    @description = random_article.description
-    @provider_name = random_article.provider_name
-    parsed_date_published = random_article.date_published.in_time_zone('Tokyo')
-    @date_published = "#{parsed_date_published.month}月#{parsed_date_published.day}日#{parsed_date_published.hour}時#{parsed_date_published.min}分"
-    @image_url = random_article.image_url
-    @image_width = random_article.image_width
-    @image_height = random_article.image_height
+  end
+
+  def index
+    # @pages = Page.all
+  end
+
+  def create
+    #
+  end
+
+  def show
+    # @random_article = Page.where( 'id >= ?', rand(Page.first.id..Page.last.id) ).first
   end
 end

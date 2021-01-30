@@ -3,21 +3,24 @@
 </header>
 
 <div class="title">
-  <h1 class="title_body"> <%= @title %> </h1>
+  <h1 class="title_body"> <%= @random_article.name %> </h1>
 </div>
 
 <div class="container">
   <div class="image_parent">
-    <img style="width:<%= @image_width %>px; height:<%= @image_height %>px", 
+    <img style="width:<%= @random_article.image_width %>px; height:<%= @random_article.image_height %>px", 
          class="image", 
-         src= <%= @image_url %> >
+         src= <%= @random_article.image_url %> >
   </div>
   <div class="description">
-    <p class="description_body"> <%= @description %> </p>
-    <p class="date_published"> <%= @date_published %> </p>
+    <p class="description_body"> <%= @random_article.description %> </p>
+    <% parsed_date_published = @random_article.date_published.in_time_zone('Tokyo') %>
+    <p class="date_published"> 
+      <%= "#{parsed_date_published.month}月#{parsed_date_published.day}日#{parsed_date_published.hour}時#{parsed_date_published.min}分" %> 
+    </p>
   </div>
 </div>
 
 <footer>
-  <p class="provider_name">ソース：<%= @provider_name %></p>
+  <p class="provider_name">ソース：<%= @random_article.provider_name %></p>
 </footer>
