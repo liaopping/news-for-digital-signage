@@ -10,19 +10,16 @@ class PagesController < ApplicationController
     # 現在の日時と最新のニュースの投稿日時の差が3時間あれば新しいニュースを取りに行く
     if time_diff >= 3
       # Bing News Search APIを叩く
-      accessKey = ENV['ACCESS_KEY']
       uri  = "https://api.bing.microsoft.com"
       path = "/v7.0/news/search?mkt=ja-jp&freshness=day"
       uri = URI(uri + path)
       request = Net::HTTP::Get.new(uri)
-      request['Ocp-Apim-Subscription-Key'] = accessKey
+      request['Ocp-Apim-Subscription-Key'] = ENV['ACCESS_KEY']
       response = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           http.request(request)
       end
       # DBの中身を削除する(最新記事のみDBに保存されているようにしたい)
-      if Page.exists?
-        Page.destroy_all
-      end
+      Page.destroy_all_page
       # レスポンスの記事を全て配列に詰め、一つずつDBに保存していく
       article_array = JSON.parse(response.body)["value"]
       article_array.each do |article|
@@ -80,9 +77,9 @@ class PagesController < ApplicationController
                     provider_name: article["provider"][0]["name"], 
                     date_published: date_published)
       end
-      @random_article = Page.where( 'id >= ?', rand(Page.first.id..Page.last.id) ).first
+      @random_article = Page.random_page
     else
-      @random_article = Page.where( 'id >= ?', rand(Page.first.id..Page.last.id) ).first
+      @random_article = Page.random_page
     end
   end
 
