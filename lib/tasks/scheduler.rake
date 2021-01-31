@@ -25,7 +25,6 @@ task :create_page => :environment do
   Page.destroy_all_page
   # レスポンスの記事を全て配列に詰め、一つずつDBに保存していく
   article_array = JSON.parse(response.body)["value"]
-  byebug
   article_array.each do |article|
     # Nokogiriで記事のHTMLを取得
     nokogiri_url = Nokogiri::HTML(URI.open(article["url"]))
