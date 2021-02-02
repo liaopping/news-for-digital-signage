@@ -63,8 +63,8 @@ task :create_page => :environment do
       image_height = article["image"]["thumbnail"]["height"]
     else
       image_url = "https://1.bp.blogspot.com/-D2I7Z7-HLGU/Xlyf7OYUi8I/AAAAAAABXq4/jZ0035aDGiE5dP3WiYhlSqhhMgGy8p7zACNcBGAsYHQ/s1600/no_image_square.jpg"
-      image_width = 300
-      image_height = 300
+      image_width = 400
+      image_height = 400
     end
     if article["datePublished"] != nil
       date_published = Time.iso8601(article["datePublished"])
