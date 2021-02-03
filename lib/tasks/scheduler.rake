@@ -36,8 +36,8 @@ task :create_page => :environment do
         end
     end
     if image_src_array.size > 0
-      # httpsを含むURLのみ配列に詰める
-      https_image_array = image_src_array.select{ |x| x.include?("https")}
+      # httpsと画像ファイルの拡張子を含むURLのみ配列に詰める
+      https_image_array = image_src_array.select{ |x| x.match?(/(https?:\/\/.*\.(?:png|jpg|gif|jpeg|tiff|bmp|ico|cur|psd|svg|webp))/)}
       result_size, result_place, result_width, result_height = 0, 0, 0, 0
       # httpsを含むURLが一つ以上あれば、画像サイズ判定の処理に進む
       if https_image_array.size > 0
