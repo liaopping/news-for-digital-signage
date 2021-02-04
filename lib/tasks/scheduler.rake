@@ -21,13 +21,17 @@ task :create_page => :environment do
   article_array = JSON.parse(response.body)["value"]
   article_array.each do |article|
     # Nokogiriで記事のHTMLを取得
-    nokogiri_url = Nokogiri::HTML(URI.open(article["url"], "User-Agent" => "Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"))
-    image_src_array = []
-    # imgタグを全て抽出し、src属性の値を全て配列に詰める
-    nokogiri_url.search('//img').each do |element_in_url|
+    begin
+      nokogiri_url = Nokogiri::HTML(URI.open(article["url"], "User-Agent" => "Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"))
+      image_src_array = []
+      # imgタグを全て抽出し、src属性の値を全て配列に詰める
+      nokogiri_url.search('//img').each do |element_in_url|
         if element_in_url.attributes["src"] != nil
-            image_src_array << element_in_url.attributes["src"].value
+          image_src_array << element_in_url.attributes["src"].value
         end
+      end
+    rescue
+      next
     end
     if image_src_array.size > 0
       # httpsと画像ファイルの拡張子を含むURLのみ配列に詰める
