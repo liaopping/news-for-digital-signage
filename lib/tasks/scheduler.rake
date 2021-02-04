@@ -21,7 +21,7 @@ task :create_page => :environment do
   article_array = JSON.parse(response.body)["value"]
   article_array.each do |article|
     # Nokogiriで記事のHTMLを取得
-    nokogiri_url = Nokogiri::HTML(URI.open(article["url"]))
+    nokogiri_url = Nokogiri::HTML(URI.open(article["url"], "User-Agent" => "Mozilla/5.0 CK={} (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"))
     image_src_array = []
     # imgタグを全て抽出し、src属性の値を全て配列に詰める
     nokogiri_url.search('//img').each do |element_in_url|
