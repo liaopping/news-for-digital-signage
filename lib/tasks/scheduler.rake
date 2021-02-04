@@ -4,12 +4,6 @@ require 'json'
 require 'open-uri'
 require 'time'
 
-desc "This task is called by the Heroku scheduler add-on"
-task :test_scheduler => :environment do
-  puts "scheduler test"
-  puts "it works."
-end
-
 task :create_page => :environment do
   puts "Creating page..."
   # Bing News Search APIを叩く
@@ -43,12 +37,16 @@ task :create_page => :environment do
       if https_image_array.size > 0
         https_image_array.each_with_index do |elt, idx|
           # image_size[width, height]
-          image_size = FastImage.size(elt)
-          if result_size < image_size[0] + image_size[1]
-            result_size = image_size[0] + image_size[1]
-            result_width = image_size[0]
-            result_height = image_size[1]
-            result_place = idx
+          begin
+            image_size = FastImage.size(elt)
+            if result_size < image_size[0] + image_size[1]
+              result_size = image_size[0] + image_size[1]
+              result_width = image_size[0]
+              result_height = image_size[1]
+              result_place = idx
+            end
+          rescue
+            next
           end
         end
       end
